@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MovieApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="backgroundColor">@android:color/white</item>
+
+    </style>
+
+    <style name="FIELD">
+        <item name="android:backgroundTint">@color/light_field</item>
+        <item name="android:background">@drawable/field</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Theme.MovieApp" parent="Base.Theme.MovieApp" />
+
+
+</resources>
