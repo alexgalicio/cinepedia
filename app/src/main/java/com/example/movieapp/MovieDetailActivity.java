@@ -1,6 +1,6 @@
 package com.example.movieapp;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -51,7 +51,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView buttonSeeAllCast;
     private List<CreditsResponse.Cast> castList; // Save full cast list
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +68,8 @@ public class MovieDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        buttonSeeAllCast = findViewById(R.id.buttonSeeAllCast);
         genreContainer = findViewById(R.id.genreContainer);
         textLanguages = findViewById(R.id.textLanguages);
         textCountries = findViewById(R.id.textCountries);
@@ -133,6 +134,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 }
             });
         }
+
     }
 
     private void fetchTrailer(int movieId) {
@@ -259,6 +261,8 @@ public class MovieDetailActivity extends AppCompatActivity {
                     Glide.with(MovieDetailActivity.this)
                             .load(movie.getPosterUrl())
                             .transform(new RoundedCorners(20))
+                            .placeholder(R.drawable.no_poster)
+                            .error(R.drawable.no_poster)
                             .into(imagePoster);
 
                     // Set spoken languages
@@ -380,6 +384,21 @@ public class MovieDetailActivity extends AppCompatActivity {
                     recyclerCast.setLayoutManager(new LinearLayoutManager(MovieDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
                     CastAdapter adapter = new CastAdapter(credits.getCast());
                     recyclerCast.setAdapter(adapter);
+
+                    castList = credits.getCast(); // Save for later
+
+                    if (castList != null && !castList.isEmpty()) {
+                        buttonSeeAllCast.setVisibility(View.VISIBLE); // Show See All if there are cast
+                    }
+
+                    buttonSeeAllCast.setOnClickListener(v -> {
+                        if (castList != null) {
+                            Intent intent = new Intent(MovieDetailActivity.this, AllCastActivity.class);
+                            intent.putParcelableArrayListExtra("cast_list", new ArrayList<>(castList)); // Passing cast data
+                            startActivity(intent);
+                        }
+                    });
+
                 }
             }
 

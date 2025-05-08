@@ -1,5 +1,6 @@
 package com.example.movieapp;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,15 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.CastViewHolder
                 .placeholder(R.drawable.no_profile)
                 .error(R.drawable.no_profile)
                 .into(holder.profile);
+
+        // Set click listener to open cast details
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), CastDetailActivity.class);
+            intent.putExtra("cast_id", cast.getId());
+            intent.putExtra("cast_name", cast.getName());
+            intent.putExtra("profile_path", cast.getProfilePath());
+            holder.itemView.getContext().startActivity(intent);
+        });
 
     }
 

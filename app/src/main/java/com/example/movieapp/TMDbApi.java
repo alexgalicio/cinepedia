@@ -101,4 +101,18 @@ public interface TMDbApi {
             @Query("api_key") String apiKey
     );
 
+    // Get person details
+    @GET("person/{person_id}")
+    Call<PersonDetail> getPersonDetails(
+            @Path("person_id") int personId,
+            @Query("api_key") String apiKey
+    );
+
+    // Get person movie credits
+    @GET("person/{person_id}/movie_credits")
+    Call<PersonCredits> getPersonCredits(
+            @Path("person_id") int personId,
+            @Query("api_key") String apiKey
+    );
+
 }

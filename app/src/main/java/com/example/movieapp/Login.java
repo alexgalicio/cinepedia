@@ -66,18 +66,24 @@ public class Login extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    showLoading();
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            startActivity(new Intent(getApplicationContext(), Dashboard.class));
-                                            finish(); // Optional: closes Login screen
-                                        }
-                                    }, 1500);
+                                    if (mAuth.getCurrentUser() != null && mAuth.getCurrentUser().isEmailVerified()) {
+                                        showLoading();
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                startActivity(new Intent(getApplicationContext(), Dashboard.class));
+                                                finish(); // Optional
+                                            }
+                                        }, 1500);
+                                    } else {
+                                        // Email not verified
+                                        mAuth.signOut(); // Sign out to prevent unauthorized access
+                                        Toast.makeText(Login.this, "Please verify your email before logging in.", Toast.LENGTH_LONG).show();
+                                    }
                                 } else {
-                                    Toast.makeText(Login.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Login.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
+
                             }
                         });
             }

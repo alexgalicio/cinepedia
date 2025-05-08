@@ -89,30 +89,44 @@ public class Register extends AppCompatActivity {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     String uid = user.getUid();
 
-                                    User userInfo = new User(firstName, lastName, email);
-                                    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Users");
-
-                                    dbRef.child(uid).setValue(userInfo)
+                                    user.sendEmailVerification() // Send verification email
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<Void> dbTask) {
-                                                    if (dbTask.isSuccessful()) {
-                                                        new Handler().postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                startActivity(new Intent(getApplicationContext(), Login.class));
-                                                                finish();
-                                                            }
-                                                        }, 1500);
+                                                public void onComplete(@NonNull Task<Void> emailTask) {
+                                                    if (emailTask.isSuccessful()) {
+                                                        // Save user data to Firebase Realtime Database
+                                                        User userInfo = new User(firstName, lastName, email);
+                                                        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Users");
+
+                                                        dbRef.child(uid).setValue(userInfo)
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> dbTask) {
+                                                                        if (dbTask.isSuccessful()) {
+                                                                            Toast.makeText(Register.this, "Verification email sent. Please verify before logging in.", Toast.LENGTH_LONG).show();
+
+                                                                            new Handler().postDelayed(new Runnable() {
+                                                                                @Override
+                                                                                public void run() {
+                                                                                    mAuth.signOut(); // Sign out to prevent auto-login
+                                                                                    startActivity(new Intent(getApplicationContext(), Login.class));
+                                                                                    finish();
+                                                                                }
+                                                                            }, 1500);
+                                                                        } else {
+                                                                            Toast.makeText(Register.this, "Failed to save user data: " + dbTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                                        }
+                                                                    }
+                                                                });
                                                     } else {
-                                                        Toast.makeText(Register.this, "Account created but failed to save data: " +
-                                                                dbTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(Register.this, "Failed to send verification email: " + emailTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                                                     }
                                                 }
                                             });
                                 } else {
                                     Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
+
 
                             }
                         });

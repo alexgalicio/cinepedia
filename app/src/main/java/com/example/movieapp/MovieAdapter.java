@@ -37,6 +37,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         Glide.with(holder.itemView).
                 load(movie.getPosterUrl())
+                .placeholder(R.drawable.no_poster)
+                .error(R.drawable.no_poster)
                 .into(holder.poster);
 
         holder.itemView.setOnClickListener(v -> {

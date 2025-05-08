@@ -51,6 +51,8 @@ public class FavoriteMovieAdapter extends RecyclerView.Adapter<FavoriteMovieAdap
         // Load poster image
         Glide.with(holder.itemView).
                 load(movie.getPosterUrl())
+                .placeholder(R.drawable.no_poster)
+                .error(R.drawable.no_poster)
                 .into(holder.ivPoster);
 
         // Set title
