@@ -20,16 +20,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Check if user is already logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            // User is signed in, go directly to Dashboard
             startActivity(new Intent(MainActivity.this, Dashboard.class));
-            finish(); // Prevent user from returning here
+            finish();
             return;
         }
 
-        // Otherwise, show onboarding page
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_onboarding);
 
@@ -44,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         btnGetStarted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
     }

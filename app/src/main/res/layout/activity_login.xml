@@ -47,7 +47,7 @@
             style="@style/FIELD"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="24dp"
             android:hint="Password"
             android:inputType="textPassword" />
 
@@ -55,7 +55,7 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="8dp"
             android:padding="15dp"
             android:text="Login"
             android:textAllCaps="false"
@@ -83,8 +83,8 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp" />
         </LinearLayout>
-
     </LinearLayout>
+
 
     <FrameLayout
         android:id="@+id/loadingOverlay"

@@ -131,6 +131,13 @@ public class MovieDetailModel {
         return productionCompanies;
     }
 
+    @SerializedName("homepage")
+    private String homepage;
+
+    public String getHomepage() {
+        return homepage;
+    }
+
     public MovieModel toMovieModel() {
         MovieModel movie = new MovieModel();
         movie.setId(this.getId());

@@ -3,6 +3,7 @@ package com.example.movieapp;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 
 import androidx.activity.EdgeToEdge;
@@ -28,12 +29,10 @@ public class AccountActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_account);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getWindow().setNavigationBarContrastEnforced(false);
-        }
+        View decor = getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         editFirstName = findViewById(R.id.editFirstName);
         editLastName = findViewById(R.id.editLastName);
@@ -52,7 +51,9 @@ public class AccountActivity extends AppCompatActivity {
         buttonChangePassword.setOnClickListener(v -> resetPassword());
         buttonLogout.setOnClickListener(v -> {
             auth.signOut();
-            startActivity(new Intent(AccountActivity.this, Login.class));
+            Intent intent = new Intent(AccountActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             finish();
         });
 
@@ -128,7 +129,7 @@ public class AccountActivity extends AppCompatActivity {
                 auth.signOut(); // <--- LOGOUT here
 
                 // Optional: Redirect to login screen after logout
-                Intent intent = new Intent(this, Login.class);
+                Intent intent = new Intent(this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish(); // Close current activity

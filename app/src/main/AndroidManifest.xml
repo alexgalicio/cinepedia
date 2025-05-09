@@ -31,12 +31,8 @@
         <activity android:name=".AllCastActivity" />
         <activity android:name=".Dashboard" />
         <activity android:name=".CastDetailActivity" />
-        <activity android:name=".Login" />
-        <activity android:name=".Register" />
-        <activity android:name=".AllPhotosActivity"
-            android:label="Movie Photos" />
-
-
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
     </application>
 
 </manifest>

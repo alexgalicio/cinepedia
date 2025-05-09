@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class Register extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
     EditText etFirstName, etLastName, etEmail, etPassword;
     TextView tvLogin;
     Button btnSignUp;
@@ -34,8 +34,10 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_register);
+
+        View decor = getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         initialize();
     }
@@ -89,12 +91,11 @@ public class Register extends AppCompatActivity {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     String uid = user.getUid();
 
-                                    user.sendEmailVerification() // Send verification email
+                                    user.sendEmailVerification()
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> emailTask) {
                                                     if (emailTask.isSuccessful()) {
-                                                        // Save user data to Firebase Realtime Database
                                                         User userInfo = new User(firstName, lastName, email);
                                                         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Users");
 
@@ -103,28 +104,28 @@ public class Register extends AppCompatActivity {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> dbTask) {
                                                                         if (dbTask.isSuccessful()) {
-                                                                            Toast.makeText(Register.this, "Verification email sent. Please verify before logging in.", Toast.LENGTH_LONG).show();
+                                                                            Toast.makeText(RegisterActivity.this, "Verification email sent. Please verify before logging in.", Toast.LENGTH_LONG).show();
 
                                                                             new Handler().postDelayed(new Runnable() {
                                                                                 @Override
                                                                                 public void run() {
-                                                                                    mAuth.signOut(); // Sign out to prevent auto-login
-                                                                                    startActivity(new Intent(getApplicationContext(), Login.class));
+                                                                                    mAuth.signOut();
+                                                                                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                                                                                     finish();
                                                                                 }
                                                                             }, 1500);
                                                                         } else {
-                                                                            Toast.makeText(Register.this, "Failed to save user data: " + dbTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                                            Toast.makeText(RegisterActivity.this, "Failed to save user data: " + dbTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                                                                         }
                                                                     }
                                                                 });
                                                     } else {
-                                                        Toast.makeText(Register.this, "Failed to send verification email: " + emailTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(RegisterActivity.this, "Failed to send verification email: " + emailTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                                                     }
                                                 }
                                             });
                                 } else {
-                                    Toast.makeText(Register.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
 
 
@@ -136,7 +137,7 @@ public class Register extends AppCompatActivity {
         tvLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
     }

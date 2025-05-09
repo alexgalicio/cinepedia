@@ -1,6 +1,8 @@
 package com.example.movieapp;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -50,17 +52,29 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private TextView buttonSeeAllCast;
     private List<CreditsResponse.Cast> castList; // Save full cast list
+    private RecyclerView recyclerOfficialTrailers;
+
+    private ImageView linkImdb, linkFacebook, linkTwitter, linkInstagram, linkWebsite;
+    private MovieDetailModel currentMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getWindow().setNavigationBarContrastEnforced(false);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            getWindow().setNavigationBarContrastEnforced(false);
+//        }
+
+        View decor = getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
 
         setContentView(R.layout.activity_movie_detail);
+
+        recyclerOfficialTrailers = findViewById(R.id.recyclerOfficialTrailers);
+        recyclerOfficialTrailers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
 
         int movieId = getIntent().getIntExtra("movie_id", -1);
         if (movieId == -1) {
@@ -68,6 +82,11 @@ public class MovieDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
+        linkImdb = findViewById(R.id.linkImdb);
+        linkFacebook = findViewById(R.id.linkFacebook);
+        linkTwitter = findViewById(R.id.linkTwitter);
+        linkInstagram = findViewById(R.id.linkInstagram);
+        linkWebsite = findViewById(R.id.linkWebsite);
 
         buttonSeeAllCast = findViewById(R.id.buttonSeeAllCast);
         genreContainer = findViewById(R.id.genreContainer);
@@ -96,6 +115,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         fetchMovieCredits(movieId);
         loadMoreLikeThis(movieId);
         fetchTrailer(movieId);
+        fetchExternalLinks(movieId);
 
         ImageView buttonBack = findViewById(R.id.buttonBack);
         buttonBack.setOnClickListener(v -> finish());
@@ -137,31 +157,101 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     }
 
+    private void fetchExternalLinks(int movieId) {
+        api.getMovieExternalIds(movieId, API_KEY).enqueue(new Callback<ExternalIdsResponse>() {
+            @Override
+            public void onResponse(Call<ExternalIdsResponse> call, Response<ExternalIdsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ExternalIdsResponse externalIds = response.body();
+
+                    // IMDb
+                    if (externalIds.getImdbId() != null && !externalIds.getImdbId().isEmpty()) {
+                        linkImdb.setVisibility(View.VISIBLE);
+                        linkImdb.setOnClickListener(v -> {
+                            String url = "https://www.imdb.com/title/" + externalIds.getImdbId();
+                            openUrl(url);
+                        });
+                    }
+
+                    // Facebook
+                    if (externalIds.getFacebookId() != null && !externalIds.getFacebookId().isEmpty()) {
+                        linkFacebook.setVisibility(View.VISIBLE);
+                        linkFacebook.setOnClickListener(v -> {
+                            String url = "https://www.facebook.com/" + externalIds.getFacebookId();
+                            openUrl(url);
+                        });
+                    }
+
+                    // Twitter
+                    if (externalIds.getTwitterId() != null && !externalIds.getTwitterId().isEmpty()) {
+                        linkTwitter.setVisibility(View.VISIBLE);
+                        linkTwitter.setOnClickListener(v -> {
+                            String url = "https://twitter.com/" + externalIds.getTwitterId();
+                            openUrl(url);
+                        });
+                    }
+
+                    // Instagram
+                    if (externalIds.getInstagramId() != null && !externalIds.getInstagramId().isEmpty()) {
+                        linkInstagram.setVisibility(View.VISIBLE);
+                        linkInstagram.setOnClickListener(v -> {
+                            String url = "https://www.instagram.com/" + externalIds.getInstagramId();
+                            openUrl(url);
+                        });
+                    }
+
+                    // Website (from movie details)
+                    if (currentMovie != null && currentMovie.getHomepage() != null && !currentMovie.getHomepage().isEmpty()) {
+                        linkWebsite.setVisibility(View.VISIBLE);
+                        linkWebsite.setOnClickListener(v -> openUrl(currentMovie.getHomepage()));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ExternalIdsResponse> call, Throwable t) {
+                // Optional: Handle failure
+            }
+        });
+    }
+
+    private void openUrl(String url) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No application can handle this request", Toast.LENGTH_SHORT).show();
+        }
+    }
     private void fetchTrailer(int movieId) {
         api.getMovieVideos(movieId, API_KEY).enqueue(new Callback<VideoResponse>() {
             @Override
             public void onResponse(Call<VideoResponse> call, Response<VideoResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<VideoModel> videos = response.body().getResults();
-
-                    if (videos != null && !videos.isEmpty()) {
-                        for (VideoModel video : videos) {
-                            if ("Trailer".equalsIgnoreCase(video.getType()) && "YouTube".equalsIgnoreCase(video.getSite())) {
-                                String videoKey = video.getKey();
-                                showTrailer(videoKey);
-                                break;
-                            }
+                    List<VideoModel> trailers = new ArrayList<>();
+                    for (VideoModel video : response.body().getResults()) {
+                        if ("Trailer".equalsIgnoreCase(video.getType()) && "YouTube".equalsIgnoreCase(video.getSite())) {
+                            trailers.add(video);
                         }
+                    }
+
+                    if (!trailers.isEmpty()) {
+                        TrailerAdapter adapter = new TrailerAdapter(trailers, MovieDetailActivity.this);
+                        recyclerOfficialTrailers.setAdapter(adapter);
+
+                        // Optionally, play the first trailer at the top:
+                        showTrailer(trailers.get(0).getKey());
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<VideoResponse> call, Throwable t) {
-                Toast.makeText(MovieDetailActivity.this, "Failed to load trailer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MovieDetailActivity.this, "Failed to load trailers", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void showTrailer(String videoKey) {
         YouTubePlayerView youtubePlayerView = findViewById(R.id.youtubePlayerView);
@@ -190,7 +280,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
     }
 
-    
+
     private void storeFavoriteMovie(String userId, int movieId) {
         api.getMovieDetails(movieId, API_KEY).enqueue(new Callback<MovieDetailModel>() {
             @Override
@@ -251,6 +341,8 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void onResponse(Call<MovieDetailModel> call, Response<MovieDetailModel> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetailModel movie = response.body();
+                    currentMovie = response.body();
+
                     textTitle.setText(movie.getTitle());
                     textYear.setText(movie.getReleaseYear());
                     textDuration.setText(formatRuntime(movie.getRuntime()));
@@ -316,7 +408,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                             genreContainer.addView(chip);
                         }
                     }
-
+                    fetchExternalLinks(movieId);
                 }
             }
 

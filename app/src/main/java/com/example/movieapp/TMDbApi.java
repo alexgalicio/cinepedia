@@ -29,7 +29,7 @@ public interface TMDbApi {
     );
 
     @GET("movie/popular")
-    Call<MovieResponse> getPopularMovies(
+    Call<MovieResponse> getPopularMoviesPaged(
             @Query("api_key") String apiKey,
             @Query("region") String region,
             @Query("page") int page);
@@ -112,6 +112,12 @@ public interface TMDbApi {
     @GET("person/{person_id}/movie_credits")
     Call<PersonCredits> getPersonCredits(
             @Path("person_id") int personId,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("movie/{movie_id}/external_ids")
+    Call<ExternalIdsResponse> getMovieExternalIds(
+            @Path("movie_id") int movieId,
             @Query("api_key") String apiKey
     );
 

@@ -2,6 +2,7 @@ package com.example.movieapp;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,12 +39,10 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_movie_list);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getWindow().setNavigationBarContrastEnforced(false);
-        }
+        View decor = getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         textViewTitle = findViewById(R.id.textViewTitle);
         recyclerView = findViewById(R.id.recyclerViewMovies);
@@ -126,7 +125,7 @@ public class MovieListActivity extends AppCompatActivity {
 
         switch (category) {
             case "popular":
-                return api.getPopularMovies(API_KEY, "PH", page);
+                return api.getPopularMoviesPaged(API_KEY, "PH", page);
             case "top_rated":
                 return api.getTopRatedMovies(API_KEY, page);
             case "now_playing":

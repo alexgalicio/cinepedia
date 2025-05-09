@@ -8,6 +8,9 @@
         <item name="android:colorBackground">@android:color/white</item>
         <item name="backgroundColor">@android:color/white</item>
 
+        <item name="android:statusBarColor">?android:attr/colorBackground</item>
+        <item name="android:navigationBarColor">?android:attr/colorBackground</item>
+
     </style>
 
     <style name="FIELD">
