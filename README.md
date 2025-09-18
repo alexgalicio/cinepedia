@@ -4,8 +4,9 @@ It uses the TMDb API to fetch movie data.
 
 ## Screenshots
 <p float="left">
-	<img src="https://github.com/dev-aniketj/Weather-App/blob/master/SS/image1.jpg" width="200"/>
-	<img src="https://github.com/dev-aniketj/Weather-App/blob/master/SS/image2.jpg" width="200"/>
+	<img src="https://github.com/alexgalicio/cinepedia/blob/master/app/src/main/res/drawable/screenshot_1.jpg" width="200"/>
+	<img src="https://github.com/alexgalicio/cinepedia/blob/master/app/src/main/res/drawable/screenshot_2.jpg" width="200"/>
+	<img src="https://github.com/alexgalicio/cinepedia/blob/master/app/src/main/res/drawable/screenshot_3.jpg" width="200"/>
 </p>
 
 ## **Features**
